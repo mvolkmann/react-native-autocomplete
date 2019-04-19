@@ -1,16 +1,6 @@
 import {arrayOf, func, string} from 'prop-types';
 import React, {Component} from 'react';
-import {
-  Alert,
-  FlatList,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
-} from 'react-native';
-
-const identity = value => value;
+import {ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
 
 export default class AutoComplete2 extends Component {
   static propTypes = {
@@ -20,79 +10,60 @@ export default class AutoComplete2 extends Component {
     value: string.isRequired
   };
 
-  state = {
-    inputHeight: 0,
-    showList: false,
-    value: ''
-  };
-
-  // onBlur = () => {
-  //   const {filteredColors} = this.state;
-  //   if (filteredColors.length === 1) this.setState({color: filteredColors[0]});
-  // };
+  state = {inputLayout: {}, showList: false, value: ''};
 
   onChangeText = value => {
     this.setState({showList: true, value});
   };
 
   onLayout = event => {
-    const {height} = event.nativeEvent.layout;
-    this.setState({inputHeight: height});
+    const {layout} = event.nativeEvent;
+    this.setState({inputLayout: layout});
   };
 
   onValueChange = value => {
-    //Alert.alert('onValueChanged called', 'value = ' + value);
     this.setState({showList: false, value});
   };
 
-  renderItem = item => {
-    const text = item.item;
-    return (
-      <Text
-        key={text}
-        onPress={() => this.onValueChange(text)}
-        style={styles.suggestion}
-      >
-        {text}
-      </Text>
-    );
-  };
-
   render() {
-    const {inputHeight, showList, value} = this.state;
+    const {inputLayout, showList, value} = this.state;
     const {label, options} = this.props;
     const suggestions = options.filter(option => option.includes(value));
+
+    const positionStyle = {
+      left: inputLayout.x,
+      top: inputLayout.height - 1
+    };
 
     return (
       <View style={styles.container}>
         <Text style={styles.label}>{label}</Text>
-        <View style={{flexGrow: 1}}>
-          <TextInput
-            autoCapitalize="none"
-            onChangeText={this.onChangeText}
-            onFocus={() => this.setState({showList: true})}
-            onLayout={this.onLayout}
-            style={styles.textInput}
-            value={value}
-          />
-          {showList && (
-            <FlatList
-              data={suggestions}
-              keyExtractor={identity}
-              renderItem={this.renderItem}
-              style={[styles.flatList, {top: inputHeight - 1}]}
-            >
-              {suggestions.map(suggestion => (
-                <TouchableOpacity
-                  key={suggestion}
-                  onPress={() => this.onValueChange(suggestion)}
-                >
-                  <Text style={styles.suggestion}>{suggestion}</Text>
-                </TouchableOpacity>
-              ))}
-            </FlatList>
-          )}
-        </View>
+        <TextInput
+          autoCapitalize="none"
+          autoCorrect={false}
+          clearButtonMode="always"
+          onChangeText={this.onChangeText}
+          onFocus={() => this.setState({showList: true})}
+          onLayout={this.onLayout}
+          style={styles.textInput}
+          value={value}
+        />
+        {showList && (
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            style={[styles.scrollView, positionStyle]}
+          >
+            {suggestions.map(suggestion => (
+              <Text
+                key={suggestion}
+                style={styles.suggestion}
+                onPress={() => this.onValueChange(suggestion)}
+              >
+                {suggestion}
+              </Text>
+            ))}
+          </ScrollView>
+        )}
       </View>
     );
   }
@@ -104,24 +75,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginVertical: 10
   },
-  flatList: {
-    borderColor: 'gray',
-    borderWidth: 1,
-    left: 0,
-    maxHeight: 120,
-    padding: 10,
-    paddingBottom: 20,
-    position: 'absolute',
-    zIndex: 1
-  },
   label: {
     fontSize: 24,
     fontWeight: 'bold',
     marginRight: 10
   },
+  scrollView: {
+    borderColor: 'gray',
+    borderWidth: 1,
+    maxHeight: 120, // 4 items
+    position: 'absolute',
+    zIndex: 1
+  },
   suggestion: {
     color: 'black',
-    fontSize: 24
+    fontSize: 24,
+    margin: 5
   },
   textInput: {
     borderColor: 'gray',

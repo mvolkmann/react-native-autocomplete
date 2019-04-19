@@ -1,34 +1,43 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import AutoComplete from './autocomplete/autocomplete';
 import AutoComplete2 from './autocomplete/autocomplete2';
 
-const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'purple'];
+const fruits = [
+  'Apple',
+  'Banana',
+  'Cherry',
+  'Grape',
+  'Orange',
+  'Pear',
+  'Strawberry'
+];
 
 export default class App extends Component {
-  state = {partialColor: ''};
+  state = {fruit: ''};
 
-  onSelect = text => this.setState({partialColor: text});
+  onSelect = text => this.setState({fruit: text});
 
   render() {
-    const {partialColor} = this.state;
+    const {fruit} = this.state;
     return (
       <View style={styles.container}>
-        <AutoComplete
-          label="Color"
+        {/* <AutoComplete
+          label="Fruit"
           onSelect={this.onSelect}
-          options={colors}
-          value={partialColor}
-        />
+          options={fruits}
+          value={fruit}
+        /> */}
         <AutoComplete2
-          label="Color"
+          label="Fruit"
           onSelect={this.onSelect}
-          options={colors}
-          value={partialColor}
+          options={fruits}
+          value={fruit}
         />
-        <Text>After #1</Text>
+        {/* The presence of these prevents selecting any option at the same y! */}
+        {/* <Text>After #1</Text>
         <Text>After #2</Text>
-        <Text>After #3</Text>
+        <Text>After #3</Text> */}
       </View>
     );
   }

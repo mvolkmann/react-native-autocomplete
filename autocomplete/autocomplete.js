@@ -33,7 +33,6 @@ export default class AutoComplete extends Component {
     const {showPicker, value} = this.state;
     const {label, options} = this.props;
     const suggestions = options.filter(option => option.includes(value));
-    suggestions.unshift('');
 
     return (
       <View style={styles.container}>
@@ -41,6 +40,8 @@ export default class AutoComplete extends Component {
           <Text style={styles.label}>{label}</Text>
           <TextInput
             autoCapitalize="none"
+            autoCorrect={false}
+            clearButtonMode="always"
             onBlur={() => this.setState({showPicker: false})}
             onChangeText={this.onChangeText}
             onFocus={() => this.setState({showPicker: true})}
