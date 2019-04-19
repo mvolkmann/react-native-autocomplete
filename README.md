@@ -7,10 +7,10 @@
 - `npm start`
 - a browser tab will open that says "Metro Bundler" in upper-left
 - in left nav, change "CONNECTION" to "Tunnel"
-- launch mobile device camera an point at the QR code in the browser tab
-- tap "Open in Expo" that appears at top of camera app
-- type into TextInput
-- select a matching suggestion in the list that appears below the TextInput
+- launch mobile device camera and point at the QR code in the browser tab
+- tap "Open in Expo" that appears at the top of the camera app
+- type into the `TextInput`
+- select a matching suggestion in the list that appears below the `TextInput`
 
 ## Issue
 
