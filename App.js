@@ -35,9 +35,11 @@ export default class App extends Component {
           value={fruit}
         />
         {/* The presence of these prevents selecting any option at the same y! */}
-        {/* <Text>After #1</Text>
+        {/* <View pointerEvents="none"> */}
+        <Text>After #1</Text>
         <Text>After #2</Text>
-        <Text>After #3</Text> */}
+        <Text>After #3</Text>
+        {/* </View> */}
       </View>
     );
   }
@@ -48,9 +50,5 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 50
-  },
-  acv: {
-    borderColor: 'red',
-    borderWidth: 3
   }
 });
