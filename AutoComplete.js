@@ -1,6 +1,10 @@
+import {debounce} from 'lodash/function';
+import {isEqual} from 'lodash/lang';
 import {arrayOf, func, oneOfType, string} from 'prop-types';
 import React, {Component} from 'react';
 import {FlatList, StyleSheet, Text, TextInput, View} from 'react-native';
+
+const WAIT = 200;
 
 export default class AutoComplete extends Component {
   static propTypes = {
@@ -16,11 +20,16 @@ export default class AutoComplete extends Component {
     this.loadOptions();
   }
 
-  componentDidUpdate() {
-    this.loadOptions();
+  componentDidUpdate(prevProps) {
+    const {options, value} = this.props;
+    // Only call loadOptions of one of these has changed.
+    if (value !== prevProps.value || !isEqual(options, prevProps.options)) {
+      this.loadOptions();
+    }
   }
 
-  loadOptions = async () => {
+  // Using debounce to prevent too many quick calls in succession.
+  loadOptions = debounce(async () => {
     let {options, value} = this.props;
 
     if (typeof options === 'function') {
@@ -33,8 +42,11 @@ export default class AutoComplete extends Component {
       throw new Error('AutoComplete options must be an array or function');
     }
 
-    this.updateOptions(options);
-  };
+    const {realOptions} = this.state;
+    if (!isEqual(options, realOptions)) {
+      this.setState({realOptions: options});
+    }
+  }, WAIT);
 
   onChangeText = value => {
     this.setState({showList: true});
@@ -57,19 +69,14 @@ export default class AutoComplete extends Component {
     </Text>
   );
 
-  updateOptions(options) {
-    const {realOptions} = this.state;
-    const same =
-      options.length === realOptions.length &&
-      options.every((option, index) => option === realOptions[index]);
-    if (!same) this.setState({realOptions: options});
-  }
-
   render() {
     const {inputLayout, realOptions, showList} = this.state;
     const {label, value} = this.props;
 
-    const suggestions = realOptions.filter(option => option.includes(value));
+    const lowerValue = value.toLowerCase();
+    const suggestions = realOptions.filter(option =>
+      option.toLowerCase().includes(lowerValue)
+    );
 
     const positionStyle = {
       left: inputLayout.x,

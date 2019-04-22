@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
-import AutoComplete from './autocomplete/autocomplete';
-import {lastFromTime} from 'uuid-js';
+import AutoComplete from './AutoComplete';
 
 const fruits = [
   'Apple',
@@ -17,7 +16,10 @@ const fruits = [
 async function getFruits(value) {
   return new Promise(resolve => {
     setTimeout(() => {
-      const options = fruits.filter(fruit => fruit.includes(value));
+      const lowerValue = value.toLowerCase();
+      const options = fruits.filter(fruit =>
+        fruit.toLowerCase().includes(value)
+      );
       resolve(options);
     }, 100);
   });
