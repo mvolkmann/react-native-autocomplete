@@ -10,7 +10,7 @@ export default class AutoComplete extends Component {
     value: string.isRequired
   };
 
-  state = {inputLayout: {}, realOptions: [], showList: false, value: ''};
+  state = {inputLayout: {}, realOptions: [], showList: false};
 
   componentDidMount() {
     this.loadOptions();
@@ -21,11 +21,11 @@ export default class AutoComplete extends Component {
   }
 
   loadOptions = async () => {
-    let {options} = this.props;
+    let {options, value} = this.props;
 
     if (typeof options === 'function') {
       try {
-        options = await options(this.state.value);
+        options = await options(value);
       } catch (e) {
         throw new Error('AutoComplete getOptions failed: ' + e.message);
       }
@@ -37,7 +37,8 @@ export default class AutoComplete extends Component {
   };
 
   onChangeText = value => {
-    this.setState({showList: true, value});
+    this.setState({showList: true});
+    this.props.onSelect(value);
   };
 
   onLayout = event => {
@@ -46,7 +47,8 @@ export default class AutoComplete extends Component {
   };
 
   onValueChange = value => {
-    this.setState({showList: false, value});
+    this.setState({showList: false});
+    this.props.onSelect(value);
   };
 
   renderSuggestion = ({item}) => (
@@ -64,8 +66,8 @@ export default class AutoComplete extends Component {
   }
 
   render() {
-    const {inputLayout, realOptions, showList, value} = this.state;
-    const {label} = this.props;
+    const {inputLayout, realOptions, showList} = this.state;
+    const {label, value} = this.props;
 
     const suggestions = realOptions.filter(option => option.includes(value));
 
