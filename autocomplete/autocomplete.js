@@ -1,6 +1,6 @@
 import {arrayOf, func, string} from 'prop-types';
 import React, {Component} from 'react';
-import {ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
+import {FlatList, StyleSheet, Text, TextInput, View} from 'react-native';
 
 export default class AutoComplete extends Component {
   static propTypes = {
@@ -24,6 +24,12 @@ export default class AutoComplete extends Component {
   onValueChange = value => {
     this.setState({showList: false, value});
   };
+
+  renderSuggestion = ({item}) => (
+    <Text style={styles.suggestion} onPress={() => this.onValueChange(item)}>
+      {item}
+    </Text>
+  );
 
   render() {
     const {inputLayout, showList, value} = this.state;
@@ -49,20 +55,13 @@ export default class AutoComplete extends Component {
           value={value}
         />
         {showList && (
-          <ScrollView
+          <FlatList
+            data={suggestions}
             keyboardShouldPersistTaps="handled"
+            keyExtractor={item => item}
+            renderItem={this.renderSuggestion}
             style={[styles.scrollView, positionStyle]}
-          >
-            {suggestions.map(suggestion => (
-              <Text
-                key={suggestion}
-                style={styles.suggestion}
-                onPress={() => this.onValueChange(suggestion)}
-              >
-                {suggestion}
-              </Text>
-            ))}
-          </ScrollView>
+          />
         )}
       </View>
     );
