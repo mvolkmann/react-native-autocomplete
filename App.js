@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import AutoComplete from './autocomplete/autocomplete';
-import AutoComplete2 from './autocomplete/autocomplete2';
 
 const fruits = [
   'Apple',
@@ -13,6 +12,7 @@ const fruits = [
   'Strawberry'
 ];
 
+// This is a demo app for the AutoComplete component.
 export default class App extends Component {
   state = {fruit: ''};
 
@@ -22,24 +22,22 @@ export default class App extends Component {
     const {fruit} = this.state;
     return (
       <View style={styles.container}>
-        {/* <AutoComplete
-          label="Fruit"
-          onSelect={this.onSelect}
-          options={fruits}
-          value={fruit}
-        /> */}
-        <AutoComplete2
+        <View>
+          <Text>Before #1</Text>
+          <Text>Before #2</Text>
+          <Text>Before #3</Text>
+        </View>
+        <AutoComplete
           label="Fruit"
           onSelect={this.onSelect}
           options={fruits}
           value={fruit}
         />
-        {/* The presence of these prevents selecting any option at the same y! */}
-        {/* <View pointerEvents="none"> */}
-        <Text>After #1</Text>
-        <Text>After #2</Text>
-        <Text>After #3</Text>
-        {/* </View> */}
+        <View>
+          <Text>After #1</Text>
+          <Text>After #2</Text>
+          <Text>After #3</Text>
+        </View>
       </View>
     );
   }

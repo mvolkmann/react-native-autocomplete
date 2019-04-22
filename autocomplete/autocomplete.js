@@ -1,6 +1,6 @@
 import {arrayOf, func, string} from 'prop-types';
 import React, {Component} from 'react';
-import {Picker, StyleSheet, Text, TextInput, View} from 'react-native';
+import {ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
 
 export default class AutoComplete extends Component {
   static propTypes = {
@@ -10,56 +10,59 @@ export default class AutoComplete extends Component {
     value: string.isRequired
   };
 
-  state = {
-    showPicker: false,
-    value: ''
-  };
-
-  // onBlur = () => {
-  //   const {filteredColors} = this.state;
-  //   if (filteredColors.length === 1) this.setState({color: filteredColors[0]});
-  // };
+  state = {inputLayout: {}, showList: false, value: ''};
 
   onChangeText = value => {
-    this.setState({showPicker: true, value});
+    this.setState({showList: true, value});
+  };
+
+  onLayout = event => {
+    const {layout} = event.nativeEvent;
+    this.setState({inputLayout: layout});
   };
 
   onValueChange = value => {
-    if (value === '') return;
-    this.setState({showPicker: false, value});
+    this.setState({showList: false, value});
   };
 
   render() {
-    const {showPicker, value} = this.state;
+    const {inputLayout, showList, value} = this.state;
     const {label, options} = this.props;
     const suggestions = options.filter(option => option.includes(value));
 
+    const positionStyle = {
+      left: inputLayout.x,
+      top: inputLayout.height - 1
+    };
+
     return (
       <View style={styles.container}>
-        <View style={styles.row}>
-          <Text style={styles.label}>{label}</Text>
-          <TextInput
-            autoCapitalize="none"
-            autoCorrect={false}
-            clearButtonMode="always"
-            onBlur={() => this.setState({showPicker: false})}
-            onChangeText={this.onChangeText}
-            onFocus={() => this.setState({showPicker: true})}
-            style={styles.textInput}
-            value={value}
-          />
-        </View>
-        {showPicker && (
-          <Picker enabled onValueChange={this.onValueChange} selectedValue="">
+        <Text style={styles.label}>{label}</Text>
+        <TextInput
+          autoCapitalize="none"
+          autoCorrect={false}
+          clearButtonMode="always"
+          onChangeText={this.onChangeText}
+          onFocus={() => this.setState({showList: true})}
+          onLayout={this.onLayout}
+          style={styles.textInput}
+          value={value}
+        />
+        {showList && (
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            style={[styles.scrollView, positionStyle]}
+          >
             {suggestions.map(suggestion => (
-              <Picker.Item
+              <Text
                 key={suggestion}
-                label={suggestion}
-                mode="dialog"
-                value={suggestion}
-              />
+                style={styles.suggestion}
+                onPress={() => this.onValueChange(suggestion)}
+              >
+                {suggestion}
+              </Text>
             ))}
-          </Picker>
+          </ScrollView>
         )}
       </View>
     );
@@ -68,16 +71,26 @@ export default class AutoComplete extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 10
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginVertical: 10,
+    zIndex: 1 // critical!
   },
   label: {
     fontSize: 24,
     fontWeight: 'bold',
     marginRight: 10
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center'
+  scrollView: {
+    borderColor: 'gray',
+    borderWidth: 1,
+    maxHeight: 160, // 4 items
+    position: 'absolute'
+  },
+  suggestion: {
+    color: 'black',
+    fontSize: 24,
+    margin: 5
   },
   textInput: {
     borderColor: 'gray',
