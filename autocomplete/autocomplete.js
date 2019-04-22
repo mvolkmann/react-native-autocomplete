@@ -1,4 +1,4 @@
-import {arrayOf, func, string} from 'prop-types';
+import {arrayOf, func, oneOfType, string} from 'prop-types';
 import React, {Component} from 'react';
 import {FlatList, StyleSheet, Text, TextInput, View} from 'react-native';
 
@@ -6,11 +6,35 @@ export default class AutoComplete extends Component {
   static propTypes = {
     label: string,
     onSelect: func.isRequired,
-    options: arrayOf(string).isRequired,
+    options: oneOfType([arrayOf(string), func]).isRequired,
     value: string.isRequired
   };
 
-  state = {inputLayout: {}, showList: false, value: ''};
+  state = {inputLayout: {}, realOptions: [], showList: false, value: ''};
+
+  componentDidMount() {
+    this.loadOptions();
+  }
+
+  componentDidUpdate() {
+    this.loadOptions();
+  }
+
+  loadOptions = async () => {
+    let {options} = this.props;
+
+    if (typeof options === 'function') {
+      try {
+        options = await options(this.state.value);
+      } catch (e) {
+        throw new Error('AutoComplete getOptions failed: ' + e.message);
+      }
+    } else if (!Array.isArray(options)) {
+      throw new Error('AutoComplete options must be an array or function');
+    }
+
+    this.updateOptions(options);
+  };
 
   onChangeText = value => {
     this.setState({showList: true, value});
@@ -31,10 +55,19 @@ export default class AutoComplete extends Component {
     </Text>
   );
 
+  updateOptions(options) {
+    const {realOptions} = this.state;
+    const same =
+      options.length === realOptions.length &&
+      options.every((option, index) => option === realOptions[index]);
+    if (!same) this.setState({realOptions: options});
+  }
+
   render() {
-    const {inputLayout, showList, value} = this.state;
-    const {label, options} = this.props;
-    const suggestions = options.filter(option => option.includes(value));
+    const {inputLayout, realOptions, showList, value} = this.state;
+    const {label} = this.props;
+
+    const suggestions = realOptions.filter(option => option.includes(value));
 
     const positionStyle = {
       left: inputLayout.x,

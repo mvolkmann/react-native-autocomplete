@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import AutoComplete from './autocomplete/autocomplete';
+import {lastFromTime} from 'uuid-js';
 
 const fruits = [
   'Apple',
@@ -11,6 +12,16 @@ const fruits = [
   'Pear',
   'Strawberry'
 ];
+
+// This simulates getting options with a REST call.
+async function getFruits(value) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const options = fruits.filter(fruit => fruit.includes(value));
+      resolve(options);
+    }, 100);
+  });
+}
 
 // This is a demo app for the AutoComplete component.
 export default class App extends Component {
@@ -30,7 +41,7 @@ export default class App extends Component {
         <AutoComplete
           label="Fruit"
           onSelect={this.onSelect}
-          options={fruits}
+          options={getFruits}
           value={fruit}
         />
         <View>
