@@ -6,12 +6,20 @@ import {FlatList, StyleSheet, Text, TextInput, View} from 'react-native';
 
 const WAIT = 200;
 
+const identity = x => x;
+
 export default class AutoComplete extends Component {
   static propTypes = {
+    keyExtractor: func,
     label: string,
     onSelect: func.isRequired,
+    optionExtractor: func,
     options: oneOfType([arrayOf(string), func]).isRequired,
     value: string.isRequired
+  };
+  static defaultProps = {
+    keyExtractor: identity,
+    optionExtractor: identity
   };
 
   state = {inputLayout: {}, realOptions: [], showList: false};
@@ -30,7 +38,7 @@ export default class AutoComplete extends Component {
 
   // Using debounce to prevent too many quick calls in succession.
   loadOptions = debounce(async () => {
-    let {options, value} = this.props;
+    let {optionExtractor, options, value} = this.props;
 
     if (typeof options === 'function') {
       try {
@@ -41,6 +49,8 @@ export default class AutoComplete extends Component {
     } else if (!Array.isArray(options)) {
       throw new Error('AutoComplete options must be an array or function');
     }
+
+    options = options.map(optionExtractor);
 
     const {realOptions} = this.state;
     if (!isEqual(options, realOptions)) {
@@ -71,7 +81,7 @@ export default class AutoComplete extends Component {
 
   render() {
     const {inputLayout, realOptions, showList} = this.state;
-    const {label, value} = this.props;
+    const {keyExtractor, label, value} = this.props;
 
     const lowerValue = value.toLowerCase();
     const suggestions = realOptions.filter(option =>
@@ -100,7 +110,7 @@ export default class AutoComplete extends Component {
           <FlatList
             data={suggestions}
             keyboardShouldPersistTaps="handled"
-            keyExtractor={item => item}
+            keyExtractor={keyExtractor}
             renderItem={this.renderSuggestion}
             style={[styles.scrollView, positionStyle]}
           />

@@ -3,13 +3,13 @@ import {StyleSheet, Text, View} from 'react-native';
 import AutoComplete from './AutoComplete';
 
 const fruits = [
-  'Apple',
-  'Banana',
-  'Cherry',
-  'Grape',
-  'Orange',
-  'Pear',
-  'Strawberry'
+  {id: 'a', name: 'Apple'},
+  {id: 'b', name: 'Banana'},
+  {id: 'c', name: 'Cherry'},
+  {id: 'g', name: 'Grape'},
+  {id: 'o', name: 'Orange'},
+  {id: 'p', name: 'Pear'},
+  {id: 's', name: 'Strawberry'}
 ];
 
 // This simulates getting options with a REST call.
@@ -18,7 +18,7 @@ async function getFruits(value) {
     setTimeout(() => {
       const lowerValue = value.toLowerCase();
       const options = fruits.filter(fruit =>
-        fruit.toLowerCase().includes(value)
+        fruit.name.toLowerCase().includes(lowerValue)
       );
       resolve(options);
     }, 100);
@@ -41,8 +41,10 @@ export default class App extends Component {
           <Text>Before #3</Text>
         </View>
         <AutoComplete
+          keyExtractor={fruit => fruit.id}
           label="Fruit"
           onSelect={this.onSelect}
+          optionExtractor={fruit => fruit.name}
           options={getFruits}
           value={fruit}
         />
